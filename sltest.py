@@ -2,8 +2,8 @@ from flask_restful import Resource, Api
 from flask import jsonify, send_from_directory, Flask, request 
 from flask import render_template
 from mysql.connector import connect, Error
-from json import dumps
 
+import json
 import mysql.connector
 
 
@@ -44,21 +44,36 @@ def send_images(path):
 # Route specific to marking a given to-do as "done" or completed
 # does seem a bit redundant to /api/edit
 @app.route('/api/edit')
-def complete_todo():
-	task_id = int(request.args.get('id'))
+def edit_todo():
+	task_id = request.args.get('id')
 	verify_todo = check_todo(int(task_id))
-	if verify_todo != task_id: 
-		return 'No Such ID {}'.format(verify_todo)
+	if verify_todo != int(task_id):
+		json_return = {'error': 'No Such ID', 'task_id' : task_id}
+		return jsonify(json_return)
+
 	# Now we know that a task with that ID exists, we can action changes to due date/description or status
 	action = request.args.get('action')
 	print("Action = {}").format(action)
 	if action == 'complete':
-		try:
-			query_string = """UPDATE todo set completed=1 where id = %s"""
-			query = mcursor.execute(query_string,(task_id,));
-		except mysql.connector.Error as err:
-			print("An error occured while trying to update record id#{}").format(task_id,err)
-	app.logger.info('Task ',task_id, 'Mark as complete?')
+		querystring = """UPDATE todo set completed=1 where id=%s"""
+		data = (verify_todo,)
+
+	if action == 'update':	
+		edit_name = request.args.get('name')
+		edit_date = request.args.get('duedate')
+		edit_desc = request.args.get('desc')
+
+		if not edit_name:
+			print("No name specified..")
+			
+
+	try:
+		query = mcursor.execute(querystring,data)
+		db.commit()
+		print('Task {} Mark as complete?').format(task_id)
+	except mysql.connector.Error as err:
+		print("An error occured while trying to update record id#{}").format(task_id,err)
+
 	return "OK"
 
 @app.route('/api/delete')
@@ -72,8 +87,25 @@ def new_todo():
 	task_name = request.args.get('name')
 	task_desc = request.args.get('desc')
 	task_due = request.args.get('due')
-	app.logger.info('Task ',task_id, ' created')
-	return "OK"
+
+	temp_id = "test";
+
+	if not task_name:
+		result = 'fail'
+		result_str = 'No Task Name was specified'
+
+	if not task_desc:
+		result = 'fail'
+		result_str = 'No Description was given for this task'
+
+	if not task_due:
+		result = 'fail'
+		result_str = 'No due date is set for this task.'
+	else:
+		print("Due date for this task is {}").format(task_due)
+
+	json_return = [{result : result_str, 'task_id' : temp_id }]
+	return json.dumps(json_return)
 
 @app.route('/api/list_todo')
 def list_todo():
@@ -85,15 +117,27 @@ def list_todo():
 		json_data.append(dict(zip(row_headers,result)))
 	return jsonify(json_data)
         
+
+
+# Default routing of /index.html
 @app.route('/')
 def welcome():
 	return render_template('index.html')
 
 
+
+# Query the DB for a given ID and return the same ID from the database if it exists, otherwise return 0 to indicate a lack of record with that ID
 def check_todo(id):
 	querystring = """SELECT id FROM todo WHERE id = %s"""
-	query = mcursor.execute(querystring,(id,))
+	try:
+		query = mcursor.execute(querystring,(id,))
+	except mysql.connector.Error as err:
+        	print("Couldn't find a record with id#{}, error={}").format(task_id,err)
+
         rval = mcursor.fetchone()
+	if not rval:
+		return 0
+
         for result in rval:
         	return result
 
