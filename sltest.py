@@ -26,6 +26,33 @@ def send_css(path):
 def send_img(path):
 	return send_from_directory('img/', path)
 
+@app.route('/images/<path:path>')
+def send_images(path):
+	return send_from_directory('images/', path)
+
+@app.route('/api/complete')
+def complete_todo():
+	task_id = int(request.args.get('id'))
+	verify_todo = check_todo(int(task_id))
+	if verify_todo != task_id: 
+		return 'No Such ID {}'.format(verify_todo)
+	app.logger.info('Task ',task_id, 'Mark as complete?')
+	return "OK"
+
+@app.route('/api/delete')
+def delete_todo():
+	task_id = request.args.get('id')
+	app.logger.info('Task ',task_id, ' Deleted?')
+	return "OK"
+
+@app.route('/api/new')
+def new_todo():
+	task_name = request.args.get('name')
+	task_desc = request.args.get('desc')
+	task_due = request.args.get('due')
+	app.logger.info('Task ',task_id, ' created')
+	return "OK"
+
 @app.route('/api/list_todo')
 def list_todo():
 	query = mcursor.execute("select * from todo");
@@ -39,6 +66,15 @@ def list_todo():
 @app.route('/')
 def welcome():
 	return render_template('index.html')
+
+
+def check_todo(id):
+	querystring = """SELECT id FROM todo WHERE id = %s"""
+	query = mcursor.execute(querystring,(id,))
+        rval = mcursor.fetchone()
+        for result in rval:
+        	return result
+
 
 if __name__ == '__main__':
 	app.run(host='0.0.0.0',port='8888')
