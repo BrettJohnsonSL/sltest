@@ -17,83 +17,61 @@
 	<script type="text/javascript" language="javascript" src="/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" class="init">
 	
-$(document).ready(function populate() {  
-	// fetch json from the api and iterate to initially populate the display table
-	$.get("/api/list_todo", function(data) {
-		var table = $('#sltable').DataTable({ 
 
-"columns": [
-            {
-                "className":      'details-control',
-                "orderable":      false,
-                "data":           null,
-                "defaultContent": ''
-            },
-            { "data": "ID" },
-            { "data": "Name" },
-            { "data": "Due" },
-            { "data": "Status" }],
-"order": [[ 3, "desc" ]] });
+	function draw_actions(id, desc) {
+		return '<a href="#">Edit #' + id + '</a><br>'+
+			'<br>'+
+			'<a href="#">Update Desc: ' + desc + '</a>';
+	}
+	function populate() {  
+		// fetch json from the api and iterate to initially populate the display table
+		$.get("/api/list_todo", function(data) {
+			var table = $('#sltable').DataTable({ "order": [[ 3, "desc" ]] });
 
-		for (var row in data) {
-			console.log('Adding row #' + row);
-			var row_name = data[row].name;
-                        var row_id = data[row].id;
-                        var row_completed = data[row].completed;
-                        var row_desc = data[row].description;
-			var row_due = data[row].due;
-                        if (row_desc >= 1) { var pretty = 'Completed' } else { var pretty = 'Incomplete' }
-                        table.row.add([
-                                row_id,
-                                row_name,
-                                row_due,
-                                pretty
-                        ],[row_desc]);
-		}
-		table.draw();
-	},"json");
-},
-$('#sltable tbody').on('click', 'td.details-control', function () {
-        var tr = $(this).closest('tr');
-        var row = table.row( tr );
+			for (var row in data) {
+				console.log('Adding row #' + row);
+				var row_name = data[row].name;
+				var row_id = data[row].id;
+				var row_completed = data[row].completed;
+				var row_desc = data[row].description;
+				var row_due = data[row].due;
+				var actions = draw_actions(row_id,row_desc);
+				//var actions = 'test';
+				if (row_desc >= 1) { var pretty = 'Completed' } else { var pretty = 'Incomplete' }
+				table.row.add([
+					row_id,
+					row_name,
+					row_due,
+					pretty,
+					actions
+				]);
+			}
+			table.draw();
+		},"json");
+	}
+
+function init() {
+	populate();
+}
  
-        if ( row.child.isShown() ) {
-            // This row is already open - close it
-            row.child.hide();
-            tr.removeClass('shown');
-        }
-        else {
-            // Open this row
-            row.child( format(row.data()) ).show();
-            tr.addClass('shown');
-        }
-    } )
- 
-);
+$(document).ready(function() { init() });
 
 	</script>
 </head>
 
 <body>
-	<div class="display">
-		<table id="sltable" class="display" style="width:50%">
+	<div class="display"  style="width:50%">
+		<table id="sltable" class="display">
 			<thead>
 				<tr>
-					<th>#</th>
+					<th>ID</th>
 					<th>Name</th>
-					<th>Description</th>
 					<th>Due</th>
 					<th>Status</th>
+					<th>Action</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
-					<td></td>
-					<td></td>
-					<td></td>
-					<td></td>
-					<td></td>
-				</tr>
 			</tbody>
 		</table>
 	</div>
