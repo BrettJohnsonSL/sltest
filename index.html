@@ -32,7 +32,7 @@ jQuery.browser.version = RegExp.$1;
 		// functions added to each table row specific to that to-do entry
 		return '<a href="#" onclick="javascript:edit_description(' + id + '); return false;">Edit Description</a>'+
 			'<br>'+
-			'<a href="#" onclick="javascript:complete_todo(' + id + '); return false;">Mark Done</a>'
+			'<a href="#" onclick="javascript:complete_todo(' + id + '); return false;">Mark Done</a>'+
 			'<br>'+
 			'<a href="#" onclick="javascript:delete_todo(' + id + '); return false;">Delete</a>';
 			
@@ -40,7 +40,7 @@ jQuery.browser.version = RegExp.$1;
 	function populate() {  
 		// fetch json from the api and iterate to initially populate the display table
 		$.get("/api/list_todo", function(data) {
-			var table = $('#sltable').DataTable({ "order": [[ 3, "desc" ]] });
+			var table = $('#sltable').DataTable();
 
 			for (var row in data) {
 				console.log('Adding row #' + row);
@@ -51,7 +51,7 @@ jQuery.browser.version = RegExp.$1;
 				var row_due = data[row].due;
 				var actions = draw_actions(row_id,row_desc);
 				//var actions = 'test';
-				if (row_desc >= 1) { var pretty = 'Completed' } else { var pretty = 'Incomplete' }
+				if (row_completed >= 1) { var pretty = 'Completed' } else { var pretty = 'Incomplete' }
 				table.row.add([
 					row_id,
 					row_name,
@@ -65,8 +65,10 @@ jQuery.browser.version = RegExp.$1;
 	}
 
 	function complete_todo(id) {	// mark a to-do as done and verify response from the api
-		$.get('/api/complete?id=' + id, function() {
+		$.get('/api/edit?action=complete&id=' + id, function() {
 			console.log('Marked ID#'+id+' as done.');
+			$('#sltable').DataTable().clear();
+			populate();
 		})
 	}
 
@@ -94,8 +96,8 @@ function init() {
  
 $(document).ready(function() { init(); });
  $( function() {
-    $( "#pickdate" ).datepicker();
-    $( "#pickdate_edit" ).datepicker();
+    $( "#pickdate" ).datepicker({dateFormat:"yy/mm/dd"});
+    $( "#pickdate_edit" ).datepicker({dateFormat:"yy/mm/dd"});
   } );
 
 	</script>
