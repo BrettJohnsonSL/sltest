@@ -3,33 +3,46 @@ from flask import jsonify, send_from_directory, Flask, request
 from flask import render_template
 from mysql.connector import connect, Error
 from json import dumps
-import json
 
 import mysql.connector
 
+
+# Define a database connection and setup a cursor
 db = mysql.connector.connect(user='sltest', password='sillypassword', host='127.0.0.1', database='sltest') 
 mcursor = db.cursor()
 
+# Setup the main Flask app and create routes
 app = Flask(__name__, template_folder='.')
 api = Api(app)
 
 
+
+# Javascript dependencies
 @app.route('/js/<path:path>')
 def send_js(path):
 	return send_from_directory('js/', path)
 
+
+# CSS 
 @app.route('/css/<path:path>')
 def send_css(path):
 	return send_from_directory('css/', path)
 
+
+# jQuery uses /img/ sigh
 @app.route('/img/<path:path>')
 def send_img(path):
 	return send_from_directory('img/', path)
 
+# DataTables uses /images/ ..
 @app.route('/images/<path:path>')
 def send_images(path):
 	return send_from_directory('images/', path)
 
+
+
+# Route specific to marking a given to-do as "done" or completed
+# does seem a bit redundant to /api/edit
 @app.route('/api/complete')
 def complete_todo():
 	task_id = int(request.args.get('id'))
