@@ -19,6 +19,7 @@
 	
 
 	function draw_actions(id, desc) {
+		// functions added to each table row specific to that to-do entry
 		return '<a href="#" onclick="javascript:edit_description(' + id + '); return false;">Edit Description</a>'+
 			'<br>'+
 			'<a href="#" onclick="javascript:complete_todo(' + id + '); return false;">Mark Done</a>'
@@ -47,10 +48,34 @@
 					row_due,
 					pretty,
 					actions
-				]);
+				]); 
 			}
 			table.draw();
 		},"json");
+	}
+
+	function complete_todo(id) {	// mark a to-do as done and verify response from the api
+		$.get('/api/complete?id=' + id, function() {
+			console.log('Marked ID#'+id+' as done.');
+		})
+	}
+
+	function delete_todo(id) {	// delete a todo
+		$.get('/api/delete?id=' + id,function() {
+			console.log('Delete #'+id);
+		});
+	}
+
+	function edit_todo(id) { 	// edit
+		$.get('/api/update?id=' + id,function() {
+			console.log('Edit #'+id);
+		});
+	}
+
+	function new_todo(name,desc,due) {		// new todo - dynamically add a new row without a second API call assuming the insert query returns successful?
+		$.get('/api/new',function() {
+			console.log('New with name=' + name + ' and desc = ' + desc + ' and due = ' + due);
+		});
 	}
 
 function init() {
@@ -63,6 +88,8 @@ $(document).ready(function() { init() });
 </head>
 
 <body>
+	<h3>Practical Coding Assessment</h3>
+	<hr>
 	<div class="display"  style="width:50%">
 		<table id="sltable" class="display">
 			<thead>
@@ -79,4 +106,24 @@ $(document).ready(function() { init() });
 		</table>
 	</div>
 </body>
+<hr>
+<h3>New</h3>
+<div id="newtodo" class="display" style="width:50%">
+	<form method="POST" action=="/api/new">
+		Name: <input type="text" name="name"><br>
+		Due Date: <input type="text" name="due"><br>
+		Description: <textarea name="description"></textarea><br>
+	</form>
+</div>
+<br>
+<h3>Edit</h3>
+<div id="editodo" class="display" style="width:50%">
+	<form method="POST" action=="/api/update">
+		ID: <input type="text" name="name" readonly><br>
+		Name: <input type="text" name="name"><br>
+		Due Date: <input type="text" name="due"><br>
+		Description: <textarea name="description"></textarea><br>
+		Status: <input type="text" name="status"><br>
+	</form>
+</div>
 </html>

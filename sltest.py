@@ -43,12 +43,21 @@ def send_images(path):
 
 # Route specific to marking a given to-do as "done" or completed
 # does seem a bit redundant to /api/edit
-@app.route('/api/complete')
+@app.route('/api/edit')
 def complete_todo():
 	task_id = int(request.args.get('id'))
 	verify_todo = check_todo(int(task_id))
 	if verify_todo != task_id: 
 		return 'No Such ID {}'.format(verify_todo)
+	# Now we know that a task with that ID exists, we can action changes to due date/description or status
+	action = request.args.get('action')
+	print("Action = {}").format(action)
+	if action == 'complete':
+		try:
+			query_string = """UPDATE todo set completed=1 where id = %s"""
+			query = mcursor.execute(query_string,(task_id,));
+		except mysql.connector.Error as err:
+			print("An error occured while trying to update record id#{}").format(task_id,err)
 	app.logger.info('Task ',task_id, 'Mark as complete?')
 	return "OK"
 
