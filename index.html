@@ -19,9 +19,12 @@
 	
 
 	function draw_actions(id, desc) {
-		return '<a href="#">Edit #' + id + '</a><br>'+
+		return '<a href="#" onclick="javascript:edit_description(' + id + '); return false;">Edit Description</a>'+
 			'<br>'+
-			'<a href="#">Update Desc: ' + desc + '</a>';
+			'<a href="#" onclick="javascript:complete_todo(' + id + '); return false;">Mark Done</a>'
+			'<br>'+
+			'<a href="#" onclick="javascript:delete_todo(' + id + '); return false;">Delete</a>';
+			
 	}
 	function populate() {  
 		// fetch json from the api and iterate to initially populate the display table
