@@ -8,18 +8,38 @@
 	<script type="text/javascript" language="javascript" src="/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" class="init">
 	
-$(document).ready(function() {
-	$('#sltest').DataTable( {
-		"order": [[ 3, "desc" ]]
-	} );
-} );
+$(document).ready(function populate() {  
+	// fetch json from the api and iterate to initially populate the display table
+	$.get("/api/list_todo", function(data) {
+		var table = $('#sltable').DataTable({ "order": [[ 3, "desc" ]] });
+		for (var row in data) {
+			console.log('Adding row #' + row);
+			var row_name = data[row].name;
+                        var row_id = data[row].id;
+                        var row_completed = data[row].completed;
+                        var row_desc = data[row].description;
+			var row_due = data[row].due;
+                        if (row_desc >= 1) { var pretty = 'Incomplete' } else { var pretty = 'Complete' }
+                        table.row.add([
+                                row_id,
+                                row_name,
+                                row_desc,
+                                row_due,
+                                pretty
+                        ]);
+		}
+		table.draw();
+	},"json");
+}
+ 
+);
 
 	</script>
 </head>
 
 <body>
 	<div class="display">
-		<table id="example" class="display" style="width:50%">
+		<table id="sltable" class="display" style="width:50%">
 			<thead>
 				<tr>
 					<th>#</th>
@@ -36,8 +56,8 @@ $(document).ready(function() {
 					<td></td>
 					<td></td>
 					<td></td>
-					<td></td>
 				</tr>
+			</tbody>
 		</table>
 	</div>
 </body>
