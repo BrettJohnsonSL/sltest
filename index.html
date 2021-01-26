@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>sltest</title>
+	<link rel="stylesheet" type="text/css" href="/css/jquery.dataTables.min.css">
+	<script type="text/javascript" language="javascript" src="/js/jquery-3.5.1.min.js"></script>
+	<script type="text/javascript" language="javascript" src="/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" class="init">
+	
+$(document).ready(function() {
+	$('#sltest').DataTable( {
+		"order": [[ 3, "desc" ]]
+	} );
+} );
+
+	</script>
+</head>
+
+<body>
+	<div class="display">
+		<table id="example" class="display" style="width:50%">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Name</th>
+					<th>Description</th>
+					<th>Due</th>
+					<th>Status</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+		</table>
+	</div>
+</body>
+</html>
