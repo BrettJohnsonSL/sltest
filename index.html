@@ -4,6 +4,15 @@
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 	<title>sltest</title>
 	<link rel="stylesheet" type="text/css" href="/css/jquery.dataTables.min.css">
+	<style>
+	td.details-control {
+	background: url('../img/details_open.png') no-repeat center center;
+	cursor: pointer;
+	}
+	tr.shown td.details-control {
+	background: url('../img/details_close.png') no-repeat center center;
+	}
+	</style>
 	<script type="text/javascript" language="javascript" src="/js/jquery-3.5.1.min.js"></script>
 	<script type="text/javascript" language="javascript" src="/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" class="init">
@@ -11,7 +20,21 @@
 $(document).ready(function populate() {  
 	// fetch json from the api and iterate to initially populate the display table
 	$.get("/api/list_todo", function(data) {
-		var table = $('#sltable').DataTable({ "order": [[ 3, "desc" ]] });
+		var table = $('#sltable').DataTable({ 
+
+"columns": [
+            {
+                "className":      'details-control',
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": ''
+            },
+            { "data": "ID" },
+            { "data": "Name" },
+            { "data": "Due" },
+            { "data": "Status" }],
+"order": [[ 3, "desc" ]] });
+
 		for (var row in data) {
 			console.log('Adding row #' + row);
 			var row_name = data[row].name;
@@ -19,18 +42,32 @@ $(document).ready(function populate() {
                         var row_completed = data[row].completed;
                         var row_desc = data[row].description;
 			var row_due = data[row].due;
-                        if (row_desc >= 1) { var pretty = 'Incomplete' } else { var pretty = 'Complete' }
+                        if (row_desc >= 1) { var pretty = 'Completed' } else { var pretty = 'Incomplete' }
                         table.row.add([
                                 row_id,
                                 row_name,
-                                row_desc,
                                 row_due,
                                 pretty
-                        ]);
+                        ],[row_desc]);
 		}
 		table.draw();
 	},"json");
-}
+},
+$('#sltable tbody').on('click', 'td.details-control', function () {
+        var tr = $(this).closest('tr');
+        var row = table.row( tr );
+ 
+        if ( row.child.isShown() ) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {
+            // Open this row
+            row.child( format(row.data()) ).show();
+            tr.addClass('shown');
+        }
+    } )
  
 );
 
