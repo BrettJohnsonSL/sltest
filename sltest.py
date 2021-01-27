@@ -111,8 +111,13 @@ def new_todo():
 	return json.dumps(json_return)
 
 @app.route('/api/list')
-def list_todo():
-	query = mcursor.execute("select id,name,description,DATE_FORMAT(due, '%d/%m/%Y') as due,completed from todo");
+@app.route('/api/list/<id>')
+def list_todo(id = None):
+	if not id:
+		query = mcursor.execute("select id,name,description,DATE_FORMAT(due, '%d/%m/%Y') as due,completed from todo");
+	else:
+		query = mcursor.execute("select id,name,description,DATE_FORMAT(due, '%d/%m/%Y') as due,completed from todo where id=%s",(id,));
+
 	row_headers=[x[0] for x in mcursor.description] 
 	rval = mcursor.fetchall()
 	# Don't cache the query results
