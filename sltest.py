@@ -43,9 +43,10 @@ def send_images(path):
 
 # Route specific to marking a given to-do as "done" or completed
 # does seem a bit redundant to /api/edit
-@app.route('/api/edit')
-def edit_todo():
-	task_id = request.args.get('id')
+@app.route('/api/edit/<id>/')
+def edit_todo(id):
+	task_id = id
+	# request.args.get('id')
 	verify_todo = check_todo(int(task_id))
 	if verify_todo != int(task_id):
 		json_return = {'error': 'No Such ID', 'task_id' : task_id}
@@ -76,11 +77,13 @@ def edit_todo():
 
 	return "OK"
 
-@app.route('/api/delete')
-def delete_todo():
-	task_id = request.args.get('id')
-	app.logger.info('Task ',task_id, ' Deleted?')
-	return "OK"
+@app.route('/api/delete/<id>')
+def delete_todo(id):
+	# task_id = request.args.get('id')
+	result = 'warning'
+	result_str = 'not yet implemented'
+	json_return = [{result : result_str, 'task_id' : id }]
+	return jsonify(json_return)
 
 @app.route('/api/new')
 def new_todo():
@@ -107,17 +110,22 @@ def new_todo():
 	json_return = [{result : result_str, 'task_id' : temp_id }]
 	return json.dumps(json_return)
 
-@app.route('/api/list_todo')
+@app.route('/api/list')
 def list_todo():
-	query = mcursor.execute("select * from todo");
+	query = mcursor.execute("select id,name,description,DATE_FORMAT(due, '%d/%m/%Y') as due,completed from todo");
 	row_headers=[x[0] for x in mcursor.description] 
 	rval = mcursor.fetchall()
+	# Don't cache the query results
+	db.commit()
 	json_data=[]
 	for result in rval:
 		json_data.append(dict(zip(row_headers,result)))
 	return jsonify(json_data)
         
 
+@app.route('/api/test1')
+def test_return():
+	return "Hello Tester"
 
 # Default routing of /index.html
 @app.route('/')

@@ -5,6 +5,7 @@
 	<title>sltest</title>
 	<link rel="stylesheet" type="text/css" href="/css/jquery.dataTables.min.css">
 	<style>
+	th.dt-center, td.dt-center { text-align: center; }
 	td.details-control {
 	background: url('../img/details_open.png') no-repeat center center;
 	cursor: pointer;
@@ -30,17 +31,15 @@ jQuery.browser.version = RegExp.$1;
 
 	function draw_actions(id, desc) {
 		// functions added to each table row specific to that to-do entry
-		return '<a href="#" onclick="javascript:edit_description(' + id + '); return false;">Edit Description</a>'+
-			'<br>'+
-			'<a href="#" onclick="javascript:complete_todo(' + id + '); return false;">Mark Done</a>'+
-			'<br>'+
+		return '<a href="#" onclick="javascript:edit_description(' + id + '); return false;">Edit</a> | '+
+			'<a href="#" onclick="javascript:complete_todo(' + id + '); return false;">Mark Done</a> | '+
 			'<a href="#" onclick="javascript:delete_todo(' + id + '); return false;">Delete</a>';
 			
 	}
 	function populate() {  
 		// fetch json from the api and iterate to initially populate the display table
-		$.get("/api/list_todo", function(data) {
-			var table = $('#sltable').DataTable();
+		$.get("/api/list", function(data) {
+			var table = $('#sltable').DataTable({"columnDefs":[{"className":"dt-center","targets":"_all"}]});
 
 			for (var row in data) {
 				console.log('Adding row #' + row);
@@ -51,7 +50,7 @@ jQuery.browser.version = RegExp.$1;
 				var row_due = data[row].due;
 				var actions = draw_actions(row_id,row_desc);
 				//var actions = 'test';
-				if (row_completed >= 1) { var pretty = 'Completed' } else { var pretty = 'Incomplete' }
+				if (row_completed >= 1) { var pretty = 'Done' } else { var pretty = 'Pending' }
 				table.row.add([
 					row_id,
 					row_name,
@@ -65,7 +64,7 @@ jQuery.browser.version = RegExp.$1;
 	}
 
 	function complete_todo(id) {	// mark a to-do as done and verify response from the api
-		$.get('/api/edit?action=complete&id=' + id, function() {
+		$.get('/api/edit/' + id + '/?action=complete', function() {
 			console.log('Marked ID#'+id+' as done.');
 			$('#sltable').DataTable().clear();
 			populate();
@@ -73,19 +72,22 @@ jQuery.browser.version = RegExp.$1;
 	}
 
 	function delete_todo(id) {	// delete a todo
-		$.get('/api/delete?id=' + id,function() {
+		$.get('/api/delete/id/' + id,function() {
 			console.log('Delete #'+id);
 		});
 	}
 
 	function edit_todo(id) { 	// edit
-		$.get('/api/update?id=' + id,function() {
+		$.get('/api/update/id/' + id,function() {
 			console.log('Edit #'+id);
 		});
 	}
 
-	function new_todo(name,desc,due) {		// new todo - dynamically add a new row without a second API call assuming the insert query returns successful?
+	function new_todo() {		// new todo - dynamically add a new row without a second API call assuming the insert query returns successful?
 		$.get('/api/new',function() {
+			name = $('#newform').find('input[name="taskname"]').val();
+			desc = $('#newform').find('textarea[name="description"]').val();
+			due = $('#newform').find('input[name="duedate"]').val();
 			console.log('New with name=' + name + ' and desc = ' + desc + ' and due = ' + due);
 		});
 	}
@@ -96,8 +98,8 @@ function init() {
  
 $(document).ready(function() { init(); });
  $( function() {
-    $( "#pickdate" ).datepicker({dateFormat:"yy/mm/dd"});
-    $( "#pickdate_edit" ).datepicker({dateFormat:"yy/mm/dd"});
+    $( "#pickdate" ).datepicker({dateFormat:"dd/mm/yy"});
+    $( "#pickdate_edit" ).datepicker({dateFormat:"dd/mm/yy"});
   } );
 
 	</script>
@@ -107,7 +109,7 @@ $(document).ready(function() { init(); });
 	<h3>Practical Coding Assessment</h3>
 	<hr>
 	<div class="display"  style="width:50%">
-		<table id="sltable" class="display">
+		<table id="sltable" class="display" style="width:90%">
 			<thead>
 				<tr>
 					<th>ID</th>
@@ -132,10 +134,12 @@ $(document).ready(function() { init(); });
 <tr>
 <td>
 <div id="newtodo" class="display" style="width:50%">
-	<form method="POST" action=="/api/new">
-		Name: <input type="text" name="name"><br>
-		Due Date: <input type="text" name="due" id="pickdate"><br>
+	<form method="POST" action=="/api/new" id="newform">
+		Name: <input type="text" name="taskname"><br>
+		Due Date: <input type="text" name="duedate" id="pickdate"><br>
 		Description: <textarea name="description"></textarea><br>
+		<br>
+	<a href="#" onclick="javascript:new_todo(); return false;">Save</a>
 	</form>
 </div>
 </td>
@@ -146,7 +150,7 @@ $(document).ready(function() { init(); });
 		Name: <input type="text" name="name"><br>
 		Due Date: <input type="text" name="due" id="pickdate_edit"><br>
 		Description: <textarea name="description"></textarea><br>
-		Status: <input type="text" name="status"><br>
+		Status: <select id="status" name="status"><option value="1">Done</option><option value="0">Pending</option></select><br>
 	</form>
 </div>
 </td>
