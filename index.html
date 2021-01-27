@@ -126,34 +126,65 @@ $(document).ready(function() { init(); });
 </body>
 <hr>
 <table style="width:50%">
-<tr> <td>
-<h3>New</h3>
-</td>
-<td width="50%"><h3>Edit</h3> </td>
-</tr>
-<tr>
-<td>
-<div id="newtodo" class="display" style="width:50%">
-	<form method="POST" action=="/api/new" id="newform">
-		Name: <input type="text" name="taskname"><br>
-		Due Date: <input type="text" name="duedate" id="pickdate"><br>
-		Description: <textarea name="description"></textarea><br>
-		<br>
-	<a href="#" onclick="javascript:new_todo(); return false;">Save</a>
-	</form>
-</div>
-</td>
-<td>
-<div id="editodo" class="display" style="width:50%">
-	<form method="POST" action=="/api/update">
-		ID: <input type="text" name="name" readonly><br>
-		Name: <input type="text" name="name"><br>
-		Due Date: <input type="text" name="due" id="pickdate_edit"><br>
-		Description: <textarea name="description"></textarea><br>
-		Status: <select id="status" name="status"><option value="1">Done</option><option value="0">Pending</option></select><br>
-	</form>
-</div>
-</td>
-</tr>
+	<tr> <td>
+	<h3>New</h3>
+	</td>
+	<td width="50%"><h3>Edit</h3> </td>
+	</tr>
+	<tr>
+	<td>
+	<div id="newtodo" class="display" style="width:50%">
+		<form method="POST" action=="/api/new" id="newform">
+			<table>
+				<tr>
+					<td>Name</td> 
+					<td><input type="text" name="taskname"></td>
+				</tr>
+				<tr>
+					<td>Due Date </td>
+					<td><input type="text" name="duedate" id="pickdate"></td>
+				</tr>
+				<tr>
+					<td>Description</td> 
+					<td><textarea cols=30 rows=10 name="description"></textarea></td>
+				</tr>
+				<tr>
+					<td colspan=2><div align="center"> <a href="#" onclick="javascript:new_todo(); return false;">Save</a></div> </td>
+				</tr>
+			</table>
+		</form>
+	</div>
+	</td>
+	<td>
+	<div id="editodo" class="display" style="width:50%">
+		<form method="POST" action=="/api/update">
+			<table>
+				<tr>
+					<td>ID</td>
+					<td><input type="text" name="name" readonly></td>
+				</tr>
+				<tr>
+				<td>Name</td>
+				<td><input type="text" name="name"></td>
+				</tr>
+				<tr>
+				<td>Due Date</td>
+				<td><input type="text" name="due" id="pickdate_edit"></td>
+				</tr>
+				<tr>
+				<td>Status</td><td><select id="status" name="status"><option value="1">Done</option><option value="0">Pending</option></select></td>
+				</tr>
+				<tr>
+				<td>Description 
+				<td><textarea cols=30 rows=10 name="description"></textarea></td>
+				</tr>
+				<tr>
+					<td colspan=2><div align="center">Save</a></div></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+	</td>
+	</tr>
 </table>
 </html>
