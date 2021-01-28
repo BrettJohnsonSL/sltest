@@ -111,6 +111,26 @@
 		});
 	}
 
+	function save_todo() {
+		save_id = $('#editform').find('input[name="todo_id"]').val();
+		save_name = $('#editform').find('input[name="name"]').val();
+		save_due = $('#editform').find('input[name="due"]').val();
+		save_desc = $('#editform').find('textarea[name="description"]').val();
+		save_status = $('#editform').find('select[name="status"]').val();
+		console.log('Save name=' + save_name + ' (' + save_id + '). Status = ' + save_status + ' and description = '  + save_desc);
+		var savedata = [{'save_id': save_id, 'save_name': save_name, 'save_due': save_due, 'save_desc': save_desc, 'save_status': save_status, 'action': 'save'}];
+		console.log(savedata);
+		$.ajax('/api/edit/' + save_id, { 
+		    type: "POST",
+		    contentType: "application/json",
+		    dataType: "json",
+		    data: JSON.stringify(savedata),
+		    success: function(data, status){
+			console.log(newArray); 
+			console.log(status);} 
+		 });
+	}
+
 function init() {
 	populate();
 }
@@ -198,7 +218,7 @@ $(document).ready(function() { init(); });
 				<td><textarea cols=30 rows=10 name="description"></textarea></td>
 				</tr>
 				<tr>
-					<td colspan=2><div align="center">Save</a></div></td>
+					<td colspan=2><div align="center"><a href="#" onclick="save_todo(); return false">Save</a></div></td>
 				</tr>
 			</table>
 		</form>

@@ -43,7 +43,7 @@ def send_images(path):
 
 # Route specific to marking a given to-do as "done" or completed
 # does seem a bit redundant to /api/edit
-@app.route('/api/edit/<id>/')
+@app.route('/api/edit/<id>', methods = ['POST', 'GET'])
 def edit_todo(id):
 	task_id = id
 	# request.args.get('id')
@@ -53,8 +53,17 @@ def edit_todo(id):
 		return jsonify(json_return)
 
 	# Now we know that a task with that ID exists, we can action changes to due date/description or status
-	action = request.args.get('action')
-	print("Action = {}").format(action)
+	if request.method == "GET":
+		action = request.args.get('action')
+
+	if request.method == "POST":
+		jsondata = request.get_json(force = True)
+		postdata = json.dumps(jsondata)
+		print("Post Data {}").format(postdata)
+		#action = postdata['action']
+		action = 'nothing'
+	
+
 	if action == 'complete':
 		querystring = """UPDATE todo set completed=1 where id=%s"""
 		data = (verify_todo,)
